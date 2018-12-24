@@ -16,10 +16,14 @@ use yii\web\AssetBundle;
 class InfiniteScrollAsset extends AssetBundle
 {
     public $sourcePath = '@bower/jquery-infinite-scroll';
+    
     public $css = [
     ];
+    
     public $js = [  // Configured conditionally (source/minified) during init()
+        YII_DEBUG ? 'jquery.infinitescroll.js' : 'jquery.infinitescroll.min.js'
     ];
+    
     public $depends = [
         'yii\web\JqueryAsset',
     ];
@@ -27,7 +31,6 @@ class InfiniteScrollAsset extends AssetBundle
     public function init()
     {
         parent::init();
-        $this->js[] = YII_DEBUG ? 'jquery.infinitescroll.js' : 'jquery.infinitescroll.min.js';
 
         $this->publishOptions['beforeCopy'] = function ($from) {
             $path = str_replace(realpath(Yii::getAlias('@bower') . '\jquery-infinite-scroll'), '', $from);
