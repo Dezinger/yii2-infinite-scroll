@@ -20,8 +20,10 @@ class InfiniteScrollAsset extends AssetBundle
     public $css = [
     ];
     
-    public $js = [  // Configured conditionally (source/minified) during init()
-        YII_DEBUG ? 'jquery.infinitescroll.js' : 'jquery.infinitescroll.min.js'
+    public $js = [  
+        // Configured conditionally (source/minified) during init()
+        YII_DEBUG ? 'jquery.infinitescroll.js' : 'jquery.infinitescroll.min.js',
+        INFINITESCROLL_BEHAVIOR_ASSET ? INFINITESCROLL_BEHAVIOR_ASSET : null,
     ];
     
     public $depends = [
@@ -32,6 +34,7 @@ class InfiniteScrollAsset extends AssetBundle
     {
         parent::init();
 
+        //@todo: not support minify?
         $this->publishOptions['beforeCopy'] = function ($from) {
             $path = str_replace(realpath(Yii::getAlias('@bower') . '\jquery-infinite-scroll'), '', $from);
             return
