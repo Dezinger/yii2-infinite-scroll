@@ -107,37 +107,31 @@ class InfiniteScrollPager extends Widget
             throw new InvalidConfigException('The "widgetId" property must be set.');
         }
 
-        // Publish assets and register main plugin code
-        InfiniteScrollAsset::register($this->view);
 
         // Register configured behavior, if any
         $behavior = ArrayHelper::getValue($this->pluginOptions, 'behavior', null);
+        $behaviorAsset = InfiniteScrollAsset::class;
+        
         if (!is_null($behavior)) {
             switch ($behavior) {
                 case self::BEHAVIOR_TWITTER:
-                    $behaviorAsset = 'manual-trigger.js';
+                    $behaviorAsset = InfiniteScrollBehaviorTwitterAsset::class;
                     break;
                 case self::BEHAVIOR_LOCAL:
-                    $behaviorAsset = 'local.js';
+                    $behaviorAsset = InfiniteScrollBehaviorLocalAsset::class;
                     break;
                 case self::BEHAVIOR_MASONRY:
-                    $behaviorAsset = 'masonry-isotope.js';
+                    $behaviorAsset = InfiniteScrollBehaviorMasonryAsset::class;
                     break;
                 case self::BEHAVIOR_CUFON:
-                    $behaviorAsset = 'cufon.js';
+                    $behaviorAsset = InfiniteScrollBehaviorCufonAsset::class;
                     break;
-                default:
-                    $behaviorAsset = false;
-            }            
-            if ($behaviorAsset) {
-                $assetManager = $this->view->getAssetManager();
-                $assetBundle = $assetManager->getBundle(InfiniteScrollAsset::className());
-                $behaviorUrl = $assetManager->getAssetUrl($assetBundle, 'behaviors/' . $behaviorAsset);
-                $this->view->registerJsFile($behaviorUrl, [
-                    'depends' => [InfiniteScrollAsset::className()]
-                ]);
             }
         }
+        
+        // Publish assets and register main plugin code
+        $behaviorAsset::register($this->view);
+        
         
         $widgetSelector = '#' . $this->widgetId;
 
