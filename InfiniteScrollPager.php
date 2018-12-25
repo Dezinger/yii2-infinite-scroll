@@ -107,11 +107,11 @@ class InfiniteScrollPager extends Widget
             throw new InvalidConfigException('The "widgetId" property must be set.');
         }
 
+        // Publish assets and register main plugin code
+        InfiniteScrollAsset::register($this->view);
 
         // Register configured behavior, if any
         $behavior = ArrayHelper::getValue($this->pluginOptions, 'behavior', null);
-        $behaviorAsset = null;
-        
         if (!is_null($behavior)) {
             switch ($behavior) {
                 case self::BEHAVIOR_TWITTER:
@@ -126,12 +126,18 @@ class InfiniteScrollPager extends Widget
                 case self::BEHAVIOR_CUFON:
                     $behaviorAsset = 'cufon.js';
                     break;
+                default:
+                    $behaviorAsset = false;
             }            
+            if ($behaviorAsset) {
+                $assetManager = $this->view->getAssetManager();
+                $assetBundle = $assetManager->getBundle(InfiniteScrollAsset::className());
+                $behaviorUrl = $assetManager->getAssetUrl($assetBundle, 'behaviors/' . $behaviorAsset);
+                $this->view->registerJsFile($behaviorUrl, [
+                    'depends' => [InfiniteScrollAsset::className()]
+                ]);
+            }
         }
-
-        define('INFINITESCROLL_BEHAVIOR_ASSET', 'behaviors/'.$behaviorAsset);
-        // Publish assets and register main plugin code
-        InfiniteScrollAsset::register($this->view);
         
         $widgetSelector = '#' . $this->widgetId;
 

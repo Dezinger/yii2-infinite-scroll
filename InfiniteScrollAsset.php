@@ -23,7 +23,6 @@ class InfiniteScrollAsset extends AssetBundle
     public $js = [  
         // Configured conditionally (source/minified) during init()
         YII_DEBUG ? 'jquery.infinitescroll.js' : 'jquery.infinitescroll.min.js',
-        INFINITESCROLL_BEHAVIOR_ASSET ? INFINITESCROLL_BEHAVIOR_ASSET : null,
     ];
     
     public $depends = [
