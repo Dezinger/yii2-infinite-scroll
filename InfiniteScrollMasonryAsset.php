@@ -15,10 +15,10 @@ use yii\web\AssetBundle;
  */
 class InfiniteScrollMasonryAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/masonry/dist';
+    public $sourcePath = '@bower/masonry';
     
     public $js = [  
-        'masonry.pkgd.min.js'
+        'masonry.js'
     ];
     
     public $depends = [
