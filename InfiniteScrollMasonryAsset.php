@@ -18,7 +18,7 @@ class InfiniteScrollMasonryAsset extends AssetBundle
     public $sourcePath = '@bower/masonry';
     
     public $js = [  
-        'masonry.js'
+        'jquery.masonry.js'
     ];
     
     public $depends = [
