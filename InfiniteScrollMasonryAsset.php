@@ -18,7 +18,8 @@ class InfiniteScrollMasonryAsset extends AssetBundle
     public $sourcePath = '@bower/masonry/dist';
     
     public $js = [  
-        'masonry.js'
+        // Configured conditionally (source/minified) during init()
+        YII_DEBUG ? 'masonry.pkgd.js' : 'masonry.pkgd.min.js',
     ];
     
     public $depends = [
