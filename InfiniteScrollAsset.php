@@ -26,7 +26,7 @@ class InfiniteScrollAsset extends AssetBundle
     ];
     
     public $depends = [
-        'yii\web\JqueryAsset',
+        yii\web\JqueryAsset::class,
     ];
 
     public function init()

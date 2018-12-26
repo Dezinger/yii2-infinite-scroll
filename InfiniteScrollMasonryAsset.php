@@ -13,17 +13,16 @@ use yii\web\AssetBundle;
 /**
  * @author Alexander Stepanov <student_vmk@mail.ru>
  */
-class InfiniteScrollBehaviorMasonryAsset extends AssetBundle
+class InfiniteScrollMasonryAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/jquery-infinite-scroll';
+    public $sourcePath = '@bower/masonry/dist';
     
     public $js = [  
-        'behaviors/masonry-isotope.js'
+        'masonry.pkgd.min.js'
     ];
     
     public $depends = [
-        InfiniteScrollMasonryAsset::class,
-        InfiniteScrollAsset::class,
+        yii\web\JqueryAsset::class,
     ];
 
 }
