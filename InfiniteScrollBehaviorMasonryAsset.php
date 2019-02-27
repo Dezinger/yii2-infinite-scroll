@@ -22,7 +22,7 @@ class InfiniteScrollBehaviorMasonryAsset extends AssetBundle
     ];
     
     public $depends = [
-        //InfiniteScrollMasonryAsset::class,
+        InfiniteScrollMasonryAsset::class,
         InfiniteScrollAsset::class,
     ];
 
