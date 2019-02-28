@@ -22,7 +22,7 @@
     ],
     "require": {
         "yiisoft/yii2": "*",
-        "bower-asset/masonry": "2.*",
+        "bower-asset/masonry": "4.*",
         "bower-asset/jquery-infinite-scroll": "2.*"
     },
     "autoload": {
