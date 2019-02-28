@@ -42,14 +42,24 @@ class InfiniteScrollPager extends Widget
      * @var string owner widget id
      */
     public $widgetId;
+    
     /**
      * @var string CSS class of a tag that encapsulates items
      */
     public $itemsCssClass;
+    
+    
+    /**
+     * @var string CSS class 
+     */
+    public $append;
+    
+    
     /**
      * @var array infinite-scroll jQuery plugin options
      */
     public $pluginOptions = [];
+    
     /**
      * @var string|JsExpression javascript callback to be executed on loading the content via ajax call
      */
@@ -60,28 +70,41 @@ class InfiniteScrollPager extends Widget
      * You must set this property in order to make InfiniteScrollPager work.
      */
     public $pagination;
+    
     /**
      * @var array HTML attributes for the pager container tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $options = ['class' => 'pagination'];
+    
     /**
      * @var array HTML attributes for the link in a pager container tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $linkOptions = [];
+    
+    
+    /**
+     * @var string the CSS class for the link of next page button 
+     */
+    public $linkPageCssClass = 'pagination__next';
+
+
     /**
      * @var string the CSS class for the "next" page button.
      */
     public $nextPageCssClass = 'next';
+    
     /**
      * @var string the CSS class for the disabled page buttons.
      */
     public $disabledPageCssClass = 'disabled';
+    
     /**
      * @var string the label for the "next" page button. Note that this will NOT be HTML-encoded.
      */
     public $nextPageLabel = 'Load more';
+    
     /**
      * @var boolean whether to register link tag in the HTML header for next page.
      * Defaults to `false` to avoid conflicts when multiple pagers are used on one page.
@@ -89,11 +112,13 @@ class InfiniteScrollPager extends Widget
      * @see registerLinkTags()
      */
     public $registerLinkTags = false;
+    
     /**
      * @var boolean Hide widget when only one page exist.
      */
     public $hideOnSinglePage = true;
 
+    
     /**
      * Initializes the pager.
      */
@@ -139,28 +164,20 @@ class InfiniteScrollPager extends Widget
 
         
         // Set default plugin selectors / options if not configured
-        
-        /*
-        if (is_null(ArrayHelper::getValue($this->pluginOptions, 'maxPage', null)))
-            $this->pluginOptions['maxPage'] = $this->pagination->getPageCount();
-        */
-        
-        
         if (is_null(ArrayHelper::getValue($this->pluginOptions, 'contentSelector', null))) {
-            $this->pluginOptions['contentSelector'] = $widgetSelector . ' .' . $this->itemsCssClass;
+            $this->pluginOptions['contentSelector'] = "{$widgetSelector} .{$this->itemsCssClass}";
         }
         
         if (is_null(ArrayHelper::getValue($this->pluginOptions, 'append', null))) {
-            $this->pluginOptions['append'] = $this->pluginOptions['contentSelector'] . ' >';
+            $this->pluginOptions['append'] = ".{$this->append}";
+        }
+
+        if (is_null(ArrayHelper::getValue($this->pluginOptions, 'path', null))) {
+            $this->pluginOptions['path'] = ".{$this->linkPageCssClass}";
         }
         
+        
         /*
-        if (is_null(ArrayHelper::getValue($this->pluginOptions, 'navSelector', null)))
-            $this->pluginOptions['navSelector'] = $widgetSelector . " ul." . $this->options['class'];
-
-        if (is_null(ArrayHelper::getValue($this->pluginOptions, 'nextSelector', null)))
-            $this->pluginOptions['nextSelector'] = $this->pluginOptions['navSelector'] . ' li.' . $this->nextPageCssClass . " a:first";
-
         if (is_null(ArrayHelper::getValue($this->pluginOptions, 'loading', null)))
             $this->pluginOptions['loading'] = [];
         
@@ -168,13 +185,9 @@ class InfiniteScrollPager extends Widget
             $assetManager = $this->view->getAssetManager();     // Publish loader img
             list ($imgPath, $imgUrl) = $assetManager->publish('@vendor/nirvana-msu/yii2-infinite-scroll/assets/images/ajax-loader.gif');
             $this->pluginOptions['loading']['img'] = $imgUrl;
-        }*/
-        
-        
-        
-        
-        
-        
+        }
+        */
+
     }
 
     /**
@@ -222,7 +235,10 @@ class InfiniteScrollPager extends Widget
             if (($page = $currentPage + 1) >= $pageCount - 1) {
                 $page = $pageCount - 1;
             }
-            $buttons[] = $this->renderPageButton($this->nextPageLabel, $page, $this->nextPageCssClass, $currentPage >= $pageCount - 1);
+            $buttons[] = $this->renderPageButton(
+                    $this->nextPageLabel, $page, 
+                    $this->nextPageCssClass, 
+                    $currentPage >= $pageCount - 1);
         }
 
         return Html::tag('ul', implode("\n", $buttons), $this->options);
@@ -240,15 +256,21 @@ class InfiniteScrollPager extends Widget
     protected function renderPageButton($label, $page, $class, $disabled)
     {
         $options = ['class' => $class === '' ? null : $class];
+        
         if ($disabled) {
             Html::addCssClass($options, $this->disabledPageCssClass);
-
             return Html::tag('li', Html::tag('span', $label), $options);
         }
+        
         $linkOptions = $this->linkOptions;
         $linkOptions['data-page'] = $page;
-
-        return Html::tag('li', Html::a($label, $this->pagination->createUrl($page), $linkOptions), $options);
+        Html::addCssClass($linkOptions, $this->linkPageCssClass);
+        
+        return Html::tag('li', 
+                Html::a($label, 
+                        $this->pagination->createUrl($page), 
+                        $linkOptions), 
+                $options);
     }
 
     protected function initializeInfiniteScrollPlugin()
@@ -263,6 +285,7 @@ class InfiniteScrollPager extends Widget
             unset($pluginOptions['loading']);
         */
         
+        unset($pluginOptions['contentSelector']);
         $pluginOptions = Json::encode($pluginOptions);
 
         if (!$this->contentLoadedCallback instanceof JsExpression) {
@@ -271,9 +294,9 @@ class InfiniteScrollPager extends Widget
         $contentLoadedCallback = Json::encode($this->contentLoadedCallback);
 
         $this->view->registerJs("
-            $('" . $this->pluginOptions['contentSelector'] . "')
-                .infiniteScroll(" . $pluginOptions . ")
-                .on('append.infiniteScroll'," . $contentLoadedCallback . ");",
+            $('{$this->pluginOptions['contentSelector']}')
+                .infiniteScroll({$pluginOptions})
+                .on('append.infiniteScroll',{$contentLoadedCallback});",
             View::POS_END, 
             $this->widgetId . '-infinite-scroll');
     }
