@@ -42,14 +42,17 @@ class InfiniteScrollPager extends Widget
      * @var string owner widget id
      */
     public $widgetId;
+    
     /**
      * @var string CSS class of a tag that encapsulates items
      */
     public $itemsCssClass;
+    
     /**
      * @var array infinite-scroll jQuery plugin options
      */
     public $pluginOptions = [];
+    
     /**
      * @var string|JsExpression javascript callback to be executed on loading the content via ajax call
      */
@@ -60,28 +63,34 @@ class InfiniteScrollPager extends Widget
      * You must set this property in order to make InfiniteScrollPager work.
      */
     public $pagination;
+    
     /**
      * @var array HTML attributes for the pager container tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $options = ['class' => 'pagination'];
+    
     /**
      * @var array HTML attributes for the link in a pager container tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
     public $linkOptions = [];
+    
     /**
      * @var string the CSS class for the "next" page button.
      */
     public $nextPageCssClass = 'next';
+    
     /**
      * @var string the CSS class for the disabled page buttons.
      */
     public $disabledPageCssClass = 'disabled';
+    
     /**
      * @var string the label for the "next" page button. Note that this will NOT be HTML-encoded.
      */
     public $nextPageLabel = 'Load more';
+    
     /**
      * @var boolean whether to register link tag in the HTML header for next page.
      * Defaults to `false` to avoid conflicts when multiple pagers are used on one page.
@@ -89,6 +98,7 @@ class InfiniteScrollPager extends Widget
      * @see registerLinkTags()
      */
     public $registerLinkTags = false;
+    
     /**
      * @var boolean Hide widget when only one page exist.
      */
@@ -107,31 +117,6 @@ class InfiniteScrollPager extends Widget
             throw new InvalidConfigException('The "widgetId" property must be set.');
         }
 
-
-        // Register configured behavior, if any
-        $behavior = ArrayHelper::getValue($this->pluginOptions, 'behavior', null);
-        $behaviorAsset = InfiniteScrollAsset::class;
-        
-        if (!is_null($behavior)) {
-            switch ($behavior) {
-                case self::BEHAVIOR_TWITTER:
-                    $behaviorAsset = InfiniteScrollBehaviorTwitterAsset::class;
-                    break;
-                case self::BEHAVIOR_LOCAL:
-                    $behaviorAsset = InfiniteScrollBehaviorLocalAsset::class;
-                    break;
-                case self::BEHAVIOR_MASONRY:
-                    $behaviorAsset = InfiniteScrollBehaviorMasonryAsset::class;
-                    break;
-                case self::BEHAVIOR_CUFON:
-                    $behaviorAsset = InfiniteScrollBehaviorCufonAsset::class;
-                    break;
-            }
-        }
-        
-        // Publish assets and register main plugin code
-        $behaviorAsset::register($this->view);
-        
         
         $widgetSelector = '#' . $this->widgetId;
 
@@ -158,6 +143,31 @@ class InfiniteScrollPager extends Widget
             list ($imgPath, $imgUrl) = $assetManager->publish('@vendor/nirvana-msu/yii2-infinite-scroll/assets/images/ajax-loader.gif');
             $this->pluginOptions['loading']['img'] = $imgUrl;
         }
+
+        // Register configured behavior, if any
+        $behavior = ArrayHelper::getValue($this->pluginOptions, 'behavior', null);
+        $behaviorAsset = InfiniteScrollAsset::class;
+        
+        if (!is_null($behavior)) {
+            switch ($behavior) {
+                case self::BEHAVIOR_TWITTER:
+                    $behaviorAsset = InfiniteScrollBehaviorTwitterAsset::class;
+                    break;
+                case self::BEHAVIOR_LOCAL:
+                    $behaviorAsset = InfiniteScrollBehaviorLocalAsset::class;
+                    break;
+                case self::BEHAVIOR_MASONRY:
+                    $behaviorAsset = InfiniteScrollBehaviorMasonryAsset::class;
+                    $this->initializeMasonryPlugin();
+                    break;
+                case self::BEHAVIOR_CUFON:
+                    $behaviorAsset = InfiniteScrollBehaviorCufonAsset::class;
+                    break;
+            }
+        }
+        
+        // Publish assets and register main plugin code
+        $behaviorAsset::register($this->view);
     }
 
     /**
@@ -234,13 +244,29 @@ class InfiniteScrollPager extends Widget
         return Html::tag('li', Html::a($label, $this->pagination->createUrl($page), $linkOptions), $options);
     }
 
+    
+    protected function initializeMasonryPlugin()
+    {
+        $masonryOptions = isset($this->pluginOptions['masonry'])?
+                          $this->pluginOptions['masonry']:[];
+        $masonryOptions = array_filter($masonryOptions);
+        $masonryOptions = Json::encode($masonryOptions);
+        $content = $this->pluginOptions['contentSelector'];
+        $this->view->registerJs("$('{$content}').masonry({$masonryOptions});", 
+                View::POS_END);
+    }
+
+
     protected function initializeInfiniteScrollPlugin()
     {
-        $pluginOptions = array_filter($this->pluginOptions);                // Removing null entries
+        $pluginOptions = array_filter($this->pluginOptions);  
+        // Removing null entries
         $pluginOptions['loading'] = array_filter(
             ArrayHelper::getValue($this->pluginOptions, 'loading', null));  // Removing null entries
         if (empty($pluginOptions['loading']))
             unset($pluginOptions['loading']);
+        
+        unset($pluginOptions['masonry']);
         $pluginOptions = Json::encode($pluginOptions);
 
         if (!$this->contentLoadedCallback instanceof JsExpression) {
@@ -248,7 +274,7 @@ class InfiniteScrollPager extends Widget
         }
         $contentLoadedCallback = Json::encode($this->contentLoadedCallback);
 
-        $this->view->registerJs("$('" . $this->pluginOptions['contentSelector'] . "').infinitescroll(" . $pluginOptions . ", " . $contentLoadedCallback . ");",
+        $this->view->registerJs("$('{$this->pluginOptions['contentSelector']}').infinitescroll({$pluginOptions}, {$contentLoadedCallback});",
             View::POS_END, $this->widgetId . '-infinite-scroll');
     }
 }
