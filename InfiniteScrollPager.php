@@ -112,6 +112,7 @@ class InfiniteScrollPager extends Widget
         $behavior = ArrayHelper::getValue($this->pluginOptions, 'behavior', null);
         $behaviorAsset = InfiniteScrollAsset::class;
         
+/*        
         if (!is_null($behavior)) {
             switch ($behavior) {
                 case self::BEHAVIOR_TWITTER:
@@ -128,23 +129,32 @@ class InfiniteScrollPager extends Widget
                     break;
             }
         }
+*/
         
         // Publish assets and register main plugin code
         $behaviorAsset::register($this->view);
-        
+      
         
         $widgetSelector = '#' . $this->widgetId;
 
+        
         // Set default plugin selectors / options if not configured
+        
+        /*
         if (is_null(ArrayHelper::getValue($this->pluginOptions, 'maxPage', null)))
             $this->pluginOptions['maxPage'] = $this->pagination->getPageCount();
-
-        if (is_null(ArrayHelper::getValue($this->pluginOptions, 'contentSelector', null)))
+        */
+        
+        
+        if (is_null(ArrayHelper::getValue($this->pluginOptions, 'contentSelector', null))) {
             $this->pluginOptions['contentSelector'] = $widgetSelector . ' .' . $this->itemsCssClass;
-
-        if (is_null(ArrayHelper::getValue($this->pluginOptions, 'itemSelector', null)))
-            $this->pluginOptions['itemSelector'] = $this->pluginOptions['contentSelector'] . ' >';
-
+        }
+        
+        if (is_null(ArrayHelper::getValue($this->pluginOptions, 'append', null))) {
+            $this->pluginOptions['append'] = $this->pluginOptions['contentSelector'] . ' >';
+        }
+        
+        /*
         if (is_null(ArrayHelper::getValue($this->pluginOptions, 'navSelector', null)))
             $this->pluginOptions['navSelector'] = $widgetSelector . " ul." . $this->options['class'];
 
@@ -153,11 +163,18 @@ class InfiniteScrollPager extends Widget
 
         if (is_null(ArrayHelper::getValue($this->pluginOptions, 'loading', null)))
             $this->pluginOptions['loading'] = [];
+        
         if (is_null(ArrayHelper::getValue($this->pluginOptions['loading'], 'img', null))) {
             $assetManager = $this->view->getAssetManager();     // Publish loader img
             list ($imgPath, $imgUrl) = $assetManager->publish('@vendor/nirvana-msu/yii2-infinite-scroll/assets/images/ajax-loader.gif');
             $this->pluginOptions['loading']['img'] = $imgUrl;
-        }
+        }*/
+        
+        
+        
+        
+        
+        
     }
 
     /**
@@ -237,10 +254,15 @@ class InfiniteScrollPager extends Widget
     protected function initializeInfiniteScrollPlugin()
     {
         $pluginOptions = array_filter($this->pluginOptions);                // Removing null entries
+        
+        
+        /*
         $pluginOptions['loading'] = array_filter(
             ArrayHelper::getValue($this->pluginOptions, 'loading', null));  // Removing null entries
         if (empty($pluginOptions['loading']))
             unset($pluginOptions['loading']);
+        */
+        
         $pluginOptions = Json::encode($pluginOptions);
 
         if (!$this->contentLoadedCallback instanceof JsExpression) {
@@ -248,7 +270,11 @@ class InfiniteScrollPager extends Widget
         }
         $contentLoadedCallback = Json::encode($this->contentLoadedCallback);
 
-        $this->view->registerJs("$('" . $this->pluginOptions['contentSelector'] . "').infinitescroll(" . $pluginOptions . ", " . $contentLoadedCallback . ");",
-            View::POS_END, $this->widgetId . '-infinite-scroll');
+        $this->view->registerJs("
+            $('" . $this->pluginOptions['contentSelector'] . "')
+                .infiniteScroll(" . $pluginOptions . ")
+                .on('append.infiniteScroll'," . $contentLoadedCallback . ");",
+            View::POS_END, 
+            $this->widgetId . '-infinite-scroll');
     }
 }
