@@ -207,7 +207,7 @@ class InfiniteScrollPager extends Widget
             $this->registerLinkTags();
         }
         
-        echo $this->renderStatusElement();
+        //echo $this->renderStatusElement();
         echo $this->renderPageButtons();
     }
 
