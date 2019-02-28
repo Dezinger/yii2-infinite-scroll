@@ -176,6 +176,12 @@ class InfiniteScrollPager extends Widget
             $this->pluginOptions['path'] = ".{$this->linkPageCssClass}";
         }
         
+        if ($this->nextPageLabel === '') {
+            $this->pluginOptions['hideNav'] = ".{$this->options['class']}";
+        }
+        
+        
+        
         
         /*
         if (is_null(ArrayHelper::getValue($this->pluginOptions, 'loading', null)))
@@ -200,6 +206,8 @@ class InfiniteScrollPager extends Widget
         if ($this->registerLinkTags) {
             $this->registerLinkTags();
         }
+        
+        echo $this->renderStatusElement();
         echo $this->renderPageButtons();
     }
 
@@ -272,7 +280,14 @@ class InfiniteScrollPager extends Widget
                         $linkOptions), 
                 $options);
     }
+    
+    
+    protected function renderStatusElement()
+    {
+        return Html::tag('div', [], ['class' => 'scroller-status']);
+    }
 
+    
     protected function initializeInfiniteScrollPlugin()
     {
         $pluginOptions = array_filter($this->pluginOptions);                // Removing null entries
