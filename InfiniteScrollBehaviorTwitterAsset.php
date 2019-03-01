@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
  */
 class InfiniteScrollBehaviorTwitterAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/jquery-infinite-scroll';
+    public $sourcePath = __DIR__ .  '/assets/js';
     
     public $js = [  
         'behaviors/manual-trigger.js'

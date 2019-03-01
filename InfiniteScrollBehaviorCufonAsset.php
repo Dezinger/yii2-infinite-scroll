@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
  */
 class InfiniteScrollBehaviorCufonAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/jquery-infinite-scroll';
+    public $sourcePath = __DIR__ .  '/assets/js';
     
     public $js = [  
         'behaviors/cufon.js'

@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
  */
 class InfiniteScrollBehaviorLocalAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/jquery-infinite-scroll';
+    public $sourcePath = __DIR__ .  '/assets/js';
     
     public $js = [  
         'behaviors/local.js'

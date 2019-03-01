@@ -15,7 +15,7 @@ use yii\web\AssetBundle;
  */
 class InfiniteScrollAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/jquery-infinite-scroll';
+    public $sourcePath = __DIR__ .  '/assets/js';
     
     public $css = [
     ];
@@ -29,16 +29,4 @@ class InfiniteScrollAsset extends AssetBundle
         'yii\web\JqueryAsset',
     ];
 
-    public function init()
-    {
-        parent::init();
-
-        //@todo: not support minify?
-        $this->publishOptions['beforeCopy'] = function ($from) {
-            $path = str_replace(realpath(Yii::getAlias('@bower') . '\jquery-infinite-scroll'), '', $from);
-            return
-                $path !== DIRECTORY_SEPARATOR.'site'
-                && $path !== DIRECTORY_SEPARATOR.'wordpress-plugin';
-        };
-    }
 }
